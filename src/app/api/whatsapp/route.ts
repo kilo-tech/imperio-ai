@@ -108,18 +108,22 @@ ${incomingText}
 
     const graphUrl = `https://graph.facebook.com/v23.0/${phoneNumberId}/messages`;
 
-    await fetch(graphUrl, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${WHATSAPP_ACCESS_TOKEN}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        messaging_product: "whatsapp",
-        to: from,
-        text: { body: reply },
-      }),
-    });
+    const sendResponse = await fetch(graphUrl, {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${WHATSAPP_ACCESS_TOKEN}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    messaging_product: "whatsapp",
+    to: from,
+    text: { body: reply },
+  }),
+});
+
+const sendResult = await sendResponse.text();
+console.log("WhatsApp send status:", sendResponse.status);
+console.log("WhatsApp send result:", sendResult);
 
     return new Response("EVENT_RECEIVED", { status: 200 });
   } catch (error) {
