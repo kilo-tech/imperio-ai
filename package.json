@@ -1,0 +1,19 @@
+{
+  "name": "imperio-ai",
+  "private": true,
+  "scripts": {
+    "dev": "next dev"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.99.1",
+    "next": "latest",
+    "openai": "^6.29.0",
+    "react": "latest",
+    "react-dom": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "25.5.0",
+    "@types/react": "19.2.14",
+    "typescript": "5.9.3"
+  }
+}
