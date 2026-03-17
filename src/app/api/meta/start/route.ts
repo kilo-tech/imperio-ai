@@ -9,7 +9,7 @@ export async function GET() {
     `https://www.facebook.com/v18.0/dialog/oauth` +
     `?client_id=${appId}` +
     `&redirect_uri=${redirect}` +
-    `&scope=whatsapp_business_management,whatsapp_business_messaging,business_management` +
+    `&scope=whatsapp_business_management,whatsapp_business_messaging` +
     `&response_type=code`;
 
   return NextResponse.redirect(url);
