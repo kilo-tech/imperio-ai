@@ -31,6 +31,10 @@ export default function Dashboard() {
   const [faq, setFaq] = useState("");
   const [metaPhoneNumberId, setMetaPhoneNumberId] = useState("");
 
+  const [metaStatus, setMetaStatus] = useState("not_connected");
+  const [metaConnectedAt, setMetaConnectedAt] = useState("");
+  const [whatsappBusinessAccountId, setWhatsappBusinessAccountId] = useState("");
+
   const [chatInput, setChatInput] = useState("");
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
     {
@@ -91,6 +95,11 @@ export default function Dashboard() {
         setBusinessHours(business.business_hours || "");
         setFaq(business.faq || "");
         setMetaPhoneNumberId(business.meta_phone_number_id || "");
+        setMetaStatus(business.meta_status || "not_connected");
+        setMetaConnectedAt(business.meta_connected_at || "");
+        setWhatsappBusinessAccountId(
+          business.whatsapp_business_account_id || ""
+        );
 
         const { data: messagesData, error: messagesError } = await supabase
           .from("messages")
@@ -157,6 +166,12 @@ export default function Dashboard() {
   async function handleLogout() {
     await supabase.auth.signOut();
     router.push("/login");
+  }
+
+  function handleConnectWhatsApp() {
+    alert(
+      "Aquí irá el flujo oficial de Meta Embedded Signup. El siguiente paso será conectarlo para que el cliente vincule su número automáticamente."
+    );
   }
 
   async function handleSendDemoMessage(e: React.FormEvent) {
@@ -265,6 +280,51 @@ export default function Dashboard() {
           </div>
         </section>
 
+        <section className="channel-card">
+          <div className="channel-card-header">
+            <div>
+              <h2>Canal de WhatsApp</h2>
+              <p>
+                Conecta el número del negocio para activar el agente en
+                producción.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={handleConnectWhatsApp}
+            >
+              Conectar WhatsApp
+            </button>
+          </div>
+
+          <div className="channel-grid">
+            <div className="channel-item">
+              <span className="channel-label">Estado</span>
+              <strong className="channel-value">
+                {metaStatus === "connected" ? "Conectado" : "No conectado"}
+              </strong>
+            </div>
+
+            <div className="channel-item">
+              <span className="channel-label">WABA ID</span>
+              <strong className="channel-value">
+                {whatsappBusinessAccountId || "Aún no disponible"}
+              </strong>
+            </div>
+
+            <div className="channel-item">
+              <span className="channel-label">Conectado el</span>
+              <strong className="channel-value">
+                {metaConnectedAt
+                  ? new Date(metaConnectedAt).toLocaleString()
+                  : "Sin conexión todavía"}
+              </strong>
+            </div>
+          </div>
+        </section>
+
         <form onSubmit={handleSave} className="dashboard-form">
           <input
             type="text"
@@ -336,7 +396,9 @@ export default function Dashboard() {
                   </div>
                 )}
 
-                <div className={msg.text === "Escribiendo..." ? "typing-text" : ""}>
+                <div
+                  className={msg.text === "Escribiendo..." ? "typing-text" : ""}
+                >
                   {msg.text}
                 </div>
 
