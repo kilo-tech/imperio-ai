@@ -4,6 +4,13 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../lib/supabase";
 
+declare global {
+  interface Window {
+    FB: any;
+    fbAsyncInit: () => void;
+  }
+}
+
 type ChatMessage = {
   role: "user" | "assistant";
   text: string;
@@ -33,7 +40,8 @@ export default function Dashboard() {
 
   const [metaStatus, setMetaStatus] = useState("not_connected");
   const [metaConnectedAt, setMetaConnectedAt] = useState("");
-  const [whatsappBusinessAccountId, setWhatsappBusinessAccountId] = useState("");
+  const [whatsappBusinessAccountId, setWhatsappBusinessAccountId] =
+    useState("");
 
   const [chatInput, setChatInput] = useState("");
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
@@ -70,6 +78,27 @@ export default function Dashboard() {
   }, [storedMessages]);
 
   const whatsappConnected = !!metaPhoneNumberId;
+
+  useEffect(() => {
+    if (document.getElementById("facebook-jssdk")) return;
+
+    const script = document.createElement("script");
+    script.id = "facebook-jssdk";
+    script.src = "https://connect.facebook.net/en_US/sdk.js";
+    script.async = true;
+    script.defer = true;
+    script.crossOrigin = "anonymous";
+    document.body.appendChild(script);
+
+    window.fbAsyncInit = function () {
+      window.FB.init({
+        appId: process.env.NEXT_PUBLIC_META_APP_ID,
+        autoLogAppEvents: true,
+        xfbml: false,
+        version: "v23.0",
+      });
+    };
+  }, []);
 
   useEffect(() => {
     async function loadDashboardData() {
@@ -169,8 +198,32 @@ export default function Dashboard() {
   }
 
   function handleConnectWhatsApp() {
-  window.location.href = "/api/meta/start";
-}
+    if (!window.FB) {
+      alert("El SDK de Meta todavía no cargó. Intenta de nuevo en unos segundos.");
+      return;
+    }
+
+    if (!process.env.NEXT_PUBLIC_META_CONFIG_ID) {
+      alert("Falta configurar NEXT_PUBLIC_META_CONFIG_ID en Vercel.");
+      return;
+    }
+
+    window.FB.login(
+      function (response: any) {
+        console.log("Meta login response:", response);
+      },
+      {
+        config_id: process.env.NEXT_PUBLIC_META_CONFIG_ID,
+        response_type: "code",
+        override_default_response_type: true,
+        extras: {
+          setup: {},
+          featureType: "whatsapp_business_app_onboarding",
+          sessionInfoVersion: "3",
+        },
+      }
+    );
+  }
 
   async function handleSendDemoMessage(e: React.FormEvent) {
     e.preventDefault();
