@@ -169,10 +169,8 @@ export default function Dashboard() {
   }
 
   function handleConnectWhatsApp() {
-    alert(
-      "Aquí irá el flujo oficial de Meta Embedded Signup. El siguiente paso será conectarlo para que el cliente vincule su número automáticamente."
-    );
-  }
+  window.location.href = "/api/meta/start";
+}
 
   async function handleSendDemoMessage(e: React.FormEvent) {
     e.preventDefault();
